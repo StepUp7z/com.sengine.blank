@@ -1,0 +1,8 @@
+{
+	"Mod": "com.sengine.blank",
+    "HostName": "Sandtable Engine Blank Server",
+    "Map": "se_blank",
+	"MaxPlayers": 100,
+	"Password": "",
+    "RconPassword": ""
+}

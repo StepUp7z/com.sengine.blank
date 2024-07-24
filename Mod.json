@@ -1,0 +1,17 @@
+{
+  "Name": "Blank Project",
+  "Author": "SandtableEngine",
+  "Info": "SandtableEngine official blank demo",
+  "Version": "0.0.1",
+  "Font": "TsangerYuYangT",
+  "DefaultLanguage": "English",
+  "Website": "mp-gamer.com",
+  "NetworkAddress": "0.0.0.0",
+  "NetworkPort": 8192,
+  "AllowDownload": true,
+  "PrivateWorld": true,
+  "LastTime": "1721129984",
+  "NetDownload": 0,
+  "LastPlayerUUID": "6fa7aa95e482dd70d2a0cdb657dab2a27b9bb225",
+  "LastLicence": "ph/GVYLovLxphO41YJUKpw=="
+}

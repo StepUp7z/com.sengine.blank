@@ -72,5 +72,5 @@ function OnPlayerEntityLogin( player, entity )
 
 // 脚本加载事件
 function OnScriptLoad(){
-    DLog("Main2世界");
+	// TODO
 }

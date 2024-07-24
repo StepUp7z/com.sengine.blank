@@ -14,15 +14,9 @@
  * - 详细说明（Wiki）[https://sengine.mp-gamer.com/scripting/client/main](https://sengine.mp-gamer.com/scripting/client/main)
  * 
  */
-
-DLog("Main Client Top");
-
 // 脚本加载事件
 function OnScriptLoad()
 {
-
-	DLog("Main Client 1");
-
 	// 进连接前禁止聊天
 	SetChatEnabled(false);
 
@@ -31,8 +25,6 @@ function OnScriptLoad()
 
 	// 以地图配置开启主机，制定脚本（即世界）
 	CreateHost(Startup.Map, "Main2");
-
-	DLog("Main Client 1");
 
 	return;
 

@@ -16,12 +16,38 @@
  */
 
 // =========================== Script 脚本事件 ===================================
-
+// 脚本加载事件
 function OnScriptLoad(){
 
-    // 加载外部脚本
-    LoadScript("Commands.js");
+    // 加载外部脚本：获取Commands对象
+    LoadScript("WorldCommands.js");
 
-    DLog("Main2 World 1");
+}
+
+// =========================== Player 玩家事件 ===================================
+// 玩家完成加载事件
+function OnPlayerComplete( player )
+{
+
+	// 创建角色并绑定
+    // 创建角色：类型，位置，角度
+	let chara = Character.Create(0, Vector(0, 0, 0), 0);
+    // 绑定实体：角色实例，玩家断开连接是否销毁实体
+	player.SetEntity(chara, false);
+
+}
+
+// 玩家输入指令时间
+function OnPlayerCommand(player, cmd, args){
+    // 指令统一转小写
+    cmd = cmd.toLowerCase() + "";
+
+    // 是否存在于指令表判断
+    if(!(cmd in Commands)){
+        return Message("没有这个指令! 使用 /help 来查看服务端所有指令！");
+    }
+
+    // O(1)复杂度定位
+    return Commands[cmd](player, args);
 
 }

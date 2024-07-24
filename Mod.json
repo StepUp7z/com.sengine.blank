@@ -10,8 +10,8 @@
   "NetworkPort": 8192,
   "AllowDownload": true,
   "PrivateWorld": true,
-  "LastTime": "1721129984",
+  "LastTime": "0",
   "NetDownload": 0,
-  "LastPlayerUUID": "6fa7aa95e482dd70d2a0cdb657dab2a27b9bb225",
-  "LastLicence": "ph/GVYLovLxphO41YJUKpw=="
+  "LastPlayerUUID": "",
+  "LastLicence": ""
 }

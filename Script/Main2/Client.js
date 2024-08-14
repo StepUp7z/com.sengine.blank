@@ -1,10 +1,10 @@
-/**
+﻿/**
  * # Main2世界的客户端脚本  
  * 
  * - 作者：VEGETAZ  
  * - 创建时间：Jul.24, 2024  
- * - 更新时间：Jul.24, 2024  
- * - 版本：v0.0.1  
+ * - 更新时间：Aug.14, 2024  
+ * - 版本：v0.0.2  
  * 
  * ## 说明
  * 
@@ -18,8 +18,8 @@
 // 本地玩家变量
 var localPlayer = null;
 
-// 相机正常角度常量设置
-const COMMON_VANGLE = 30;
+// 相机正常角度常量设置：自从0.79T12版开始，角度与之前正负颠倒
+const COMMON_VANGLE = -30;
 
 // =========================== Entity 实体事件 ===================================
 
@@ -73,4 +73,26 @@ function OnPlayerEntityLogin( player, entity )
 // 脚本加载事件
 function OnScriptLoad(){
 	// TODO
+	// 加载外部脚本：获取Commands对象
+    LoadScript("Commands/Client.js");
+}
+
+
+
+
+// 本地指令事件
+function OnLocalCommand( cmd, args ){
+	
+	// 指令统一转小写
+    cmd = cmd.toLowerCase() + "";
+
+    // 是否存在于指令表判断
+    if(cmd in Commands){
+		// 存在则拦截，否则默认转入服务端指令：true-投递到服务端，false-拦截
+		// O(1)复杂度定位
+		Commands[cmd](args);
+		return false;
+    }
+
+	
 }

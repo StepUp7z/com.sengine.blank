@@ -3,8 +3,8 @@
  * 
  * - 作者：VEGETAZ  
  * - 创建时间：Jul.24, 2024  
- * - 更新时间：Jul.24, 2024  
- * - 版本：v0.0.1  
+ * - 更新时间：Aug.14, 2024  
+ * - 版本：v0.0.2  
  * 
  * ## 说明
  * 
@@ -20,7 +20,11 @@
 function OnScriptLoad(){
 
     // 加载外部脚本：获取Commands对象
-    LoadScript("WorldCommands.js");
+    LoadScript("Commands/World.js");
+	
+	// 根据JSON设置本服最大玩家数
+	var Startup = GetGlobalVars("Startup");
+	SetMaxPlayers(Startup.MaxPlayers);
 
 }
 
@@ -37,7 +41,7 @@ function OnPlayerComplete( player )
 
 }
 
-// 玩家输入指令时间
+// 玩家输入指令事件
 function OnPlayerCommand(player, cmd, args){
     // 指令统一转小写
     cmd = cmd.toLowerCase() + "";

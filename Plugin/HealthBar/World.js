@@ -3,8 +3,8 @@
  * 
  * - 作者：VEGETAZ  
  * - 创建时间：Aug.14, 2024  
- * - 更新时间：Aug.14, 2024  
- * - 版本：v0.0.1  
+ * - 更新时间：Dec.09, 2024  
+ * - 版本：v0.0.2 
  * 
  * ## 说明
  * 
@@ -18,14 +18,12 @@
 // 模块对象
 var HealthBar = {
 	
-	
+	// ==== 数据区 ====
 	name: "HealthBar",
-	
 	
 	// 玩家血条：数组
 	bars: null,
-	
-	
+
 	// 健康分界
 	HEALTHY_LEVEL: 20,
 	
@@ -35,15 +33,19 @@ var HealthBar = {
 		UNHEALTHY: Color(200, 200, 0)
 	},
 	
-	// 距离实体偏移
+	// 血条距离实体偏移
 	OFFSET: Vector(0, 3, 0),
 	
-	// 进度与血量之比
+	// 血条进度与血量之比
 	HEALTH_RATE: 0.01,
 	
 	// Billboard类型
 	BILLBOARD_TYPE: 2,
 	
+	// 存放：事件监听器实例哈希值，deinit中用
+	listeners: [],
+
+	// ==== 功能区 ====
 	// 新建血条
 	newBar: function(char){
 
@@ -93,17 +95,33 @@ var HealthBar = {
 	},
 	
 	
-	// 模块初始化
-	init: function(){
-		this.bars = new Array(GetMaxPlayers()).fill(null);
-		this.register();
-	},
 	
-	// 注册事件
-	register: function(){
-		
-		
-		AddListener("OnCharacterHealthChange", ( character, oldHealth, newHealth )=>{
+	// 初始化
+	init: function(){
+		// 容器初始化
+		this.bars = new Array(GetMaxPlayers()).fill(null);
+		// 遍历事件实现
+		for(let eventName in this.events){
+			// 注册事件监听：事件名，事件实现
+			let listener = AddListener(eventName, this.events[eventName]);
+			// 加入容器
+			this.listeners.push(listener);
+		}
+	},
+	// 反向初始化-插件关闭用
+	deinit: function(){
+		// 取消事件监听
+		for(let i=0; i<this.listeners.length; i++){
+			RemoveListener(this.listeners[i]);
+		}
+		this.bars = null;
+	},
+
+
+	// ==== 事件区 ====
+	events: {
+		// 角色生命值变动
+		OnCharacterHealthChange: function( character, oldHealth, newHealth ){
 
 			// 掉血时
 			if(newHealth < oldHealth){
@@ -111,42 +129,35 @@ var HealthBar = {
 				// 伤害提示
 				Billboard.CreateTips(`血量-${damage}`, character.Pos, 1, 1, false, false);
 			}
-			
-		});
+
+		},
 		
+		// 逐帧更新
+		OnFrameUpdate: function(deltaTime){
+			HealthBar.barsUpdate();
+		},
 		
+		// 玩家退出
+		OnPlayerPart: function(player, reason){
+			
+			HealthBar.bars[player.ID].Remove();
+			// help GC（也许吧）
+			HealthBar.bars[player.ID] = null;
+			
+		},
 		
-		AddListener("OnFrameUpdate", (deltaTime)=>{
+		// 玩家角色完成加载
+		OnPlayerComplete: function( player ){
 			
-			this.barsUpdate();
+			HealthBar.newBar(player.Character);
 			
-		});
-		
-		
-		AddListener("OnPlayerPart", (player, reason)=>{
-			
-			this.bars[player.ID].Remove();
-			// help GC
-			this.bars[player.ID] = null;
-			
-		});
-		
-		
-		AddListener("OnPlayerComplete", ( player )=>{
-			
-			this.newBar(player.Character);
-			
-		});
+		},
 		
 	},
 
 
-		
-		
-		
-		
 };
 
-// 模块初始化
+// 加载本文件即刻调用初始化
 HealthBar.init();
 

@@ -10,7 +10,9 @@
   "NetworkPort": 8192,
   "AllowDownload": true,
   "PrivateWorld": true,
+  "Source": "https://gitee.com/zainus-harvey-yip/com.sengine.blank.git",
   "LastTime": "1721824990",
+  "Author": "VEGETAZ",
   "NetDownload": 0,
   "LastPlayerUUID": "0013EF3F0E9F698e0f36e9bc49a8ab3bc06cad370f13c0343060",
   "LastLicence": "89fd44fdd9c2751f6a4607ec68e497a0"

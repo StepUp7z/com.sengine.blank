@@ -3,8 +3,8 @@
  * 
  * - 作者：VEGETAZ  
  * - 创建时间：Aug.14, 2024  
- * - 更新时间：Aug.14, 2024  
- * - 版本：v0.0.1  
+ * - 更新时间：Dec.08, 2024  
+ * - 版本：v0.0.4  
  * 
  * ## 说明
  * 
@@ -18,73 +18,120 @@
 // 模块对象
 var HealthVignette = {
 	
-	
+	// ==== 数据区 ====
 	name: "HealthVignette",
 	
-	// Stream信号
+	// Stream信号枚举
 	SIGNAL: {
-		HEALTHY: 0,
-		UNHEALTHY: 1
+		HEALTHY: 0x00,
+		UNHEALTHY: 0x01
 	},
-	
 
 	// 健康界限
-	HEALTHY_LEVEL: 20,	
+	HEALTHY_LEVEL: 20,
+	// 满血血量
+	MAX_HEALTH: 100,
 
-	// 模块初始化
+	// 存放：事件监听器实例哈希值，deinit中用
+	listeners: [],
+	
+	
+	// ==== 功能区 ====
+	// 初始化
 	init: function(){
-		this.register();
+		// 遍历事件实现
+		for(let eventName in this.events){
+			// 注册事件监听：事件名，事件实现
+			let listener = AddListener(eventName, this.events[eventName]);
+			// 加入容器
+			this.listeners.push(listener);
+		}
+	},
+	// 反向初始化-插件关闭用
+	deinit: function(){
+		// 取消事件监听
+		for(let i=0; i<this.listeners.length; i++){
+			RemoveListener(this.listeners[i]);
+		}
 	},
 	
-	// 注册事件
-	register: function(){
+	// 生成对象用于发送Stream
+	makeData: function(){
+		// 数据对象
+		let data = {"key": this.name};
+		return data;
+	},
+	
+	// 变动检测逻辑
+	checkChange: function(oldHealth, newHealth){
 		
-		AddListener("OnCharacterSpawn", ( character )=>{
+		// 结果对象：是否需要更改滤镜，更改类型，滤镜更改参考的新值
+		let resultObject = {isChanged: false, changeType: null, newValue: null};
+		
+		// 变为不健康，或者不健康细化变化
+		if( newHealth < this.HEALTHY_LEVEL || oldHealth >= this.HEALTHY_LEVEL && newHealth < this.HEALTHY_LEVEL ){
+			resultObject.isChanged = true;
+			resultObject.changeType = this.SIGNAL.UNHEALTHY;
+			resultObject.newValue = newHealth;
+
+		}
+		// 变为健康
+		else if( oldHealth < this.HEALTHY_LEVEL && newHealth >= this.HEALTHY_LEVEL ){
+			resultObject.isChanged = true;
+			resultObject.changeType = this.SIGNAL.HEALTHY;
+			// 健康滤镜颜色统一，此处值无用
+			resultObject.newValue = this.MAX_HEALTH;
+		}
+		
+		return resultObject;
+	},
+
+
+	// ==== 事件区 ====
+	events: {
+		// 角色出生
+		OnCharacterSpawn: function( character ){
 			
 			// JSON构造
-			let data = {"key": this.name, "value": this.SIGNAL.HEALTHY};
+			let data = HealthVignette.makeData();
+			data["value"] = HealthVignette.SIGNAL.HEALTHY;
 			// Send Stream
 			let plr = character.Owner;
 			if(plr != null){
-				plr.SendData(this.SIGNAL.HEALTHY, JSON.stringify(data));
+				plr.SendData(HealthVignette.SIGNAL.HEALTHY, JSON.stringify(data));
 			}
 			
-		});
-		
-		
-		AddListener("OnCharacterHealthChange", ( character, oldHealth, newHealth )=>{
+		},
+		// 角色生命变动
+		OnCharacterHealthChange: function( character, oldHealth, newHealth ){
 			
 			DLog("Plugin: OnCharacterHealthChange");
-
-
-			// 变为不健康
-			if( oldHealth > this.HEALTHY_LEVEL && newHealth <= this.HEALTHY_LEVEL ){
-				let data = {"key": this.name, "value": 100-newHealth};
-				// Send Stream
-				let plr = character.Owner;
-				if(plr != null){
-					plr.SendData(this.SIGNAL.UNHEALTHY, JSON.stringify(data));
-				}
-			}
-			// 变为健康
-			else if( oldHealth <= HEALTHY_LEVEL && newHealth > HEALTHY_LEVEL ){
-				let data = {"key": this.name, "value": this.SIGNAL.HEALTHY};
-				// Send Stream
-				let plr = character.Owner;
-				if(plr != null){
-					plr.SendData(this.SIGNAL.HEALTHY, JSON.stringify(data));
-				}
+			
+			// 健康变动判断
+			let result = HealthVignette.checkChange(oldHealth, newHealth);
+			
+			// 不需要改动
+			if(result.isChanged == false) return;
+			
+			// 数据对象
+			let data = HealthVignette.makeData();
+			// 写入值
+			data["value"] = result.newValue;
+			// Send Stream
+			let plr = character.Owner;
+			if(plr != null){
+				plr.SendData(result.changeType, JSON.stringify(data));
 			}
 			
-		});
-		
+		},
+
 	},
-	
-	
-	
+
+
 };
 
 
-// 模块初始化
+// 加载本文件即刻调用初始化
 HealthVignette.init();
+
 
